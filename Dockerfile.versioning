@@ -1,0 +1,11 @@
+FROM python:3.11-slim
+
+ENV PYTHONUNBUFFERED=1 \
+    DVC_NO_ANALYTICS=true
+
+ARG DVC_UID=0
+RUN if [ "${DVC_UID}" != "0" ]; then useradd --create-home --uid "${DVC_UID}" dvc; fi
+RUN pip install --no-cache-dir dvc==3.59.2 pathspec==0.12.1
+WORKDIR /workspace
+ENTRYPOINT ["dvc"]
+CMD ["--help"]

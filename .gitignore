@@ -1,0 +1,10 @@
+.env
+__pycache__/
+*.py[cod]
+.pytest_cache/
+models/production/*.pkl
+mlruns/
+airflow/logs/
+.dvc/cache/
+.dvc/tmp/
+data/snapshots/*.dump

@@ -1,0 +1,11 @@
+{
+  "accuracy": 1.0,
+  "precision": 1.0,
+  "recall": 1.0,
+  "f1_score": 1.0,
+  "data_source": "postgres:endpoint_activities",
+  "model_version": "20261001_111802",
+  "model_path": "/opt/airflow/models/production/endpoint_model_20261001_111802.pkl",
+  "mlflow_run_id": "b2ce794e556849ab9c57ecbd9933ef9e",
+  "created_at": "2026-10-01T11:18:06.112620+00:00"
+}

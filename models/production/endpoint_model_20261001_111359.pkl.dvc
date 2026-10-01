@@ -1,0 +1,5 @@
+outs:
+- md5: 33703ecc0546e4ab46766c8ca4cd1e1c
+  size: 85001
+  hash: md5
+  path: endpoint_model_20261001_111359.pkl

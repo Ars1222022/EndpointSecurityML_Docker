@@ -1,0 +1,190 @@
+name: endpointsecurityml
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: endpointsecurity
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-admin}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d:ro
+      - ./data/raw/endpoint_activities.csv:/seed/endpoint_activities.csv:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d endpointsecurity"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    environment:
+      DATABASE_URL: postgresql://admin:${POSTGRES_PASSWORD:-admin}@postgres:5432/endpointsecurity
+      MODEL_DIR: /app/models/production
+    ports:
+      - "${API_PORT:-8000}:8000"
+    volumes:
+      - ./models:/app/models
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 15s
+    restart: unless-stopped
+
+  mlflow:
+    build:
+      context: .
+      dockerfile: Dockerfile.mlflow
+    command: ["mlflow", "server", "--host", "0.0.0.0", "--port", "5000", "--backend-store-uri", "sqlite:////mlflow/mlflow.db", "--serve-artifacts", "--artifacts-destination", "/mlflow/artifacts"]
+    ports:
+      - "${MLFLOW_PORT:-5000}:5000"
+    volumes:
+      - mlflow_data:/mlflow
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    restart: unless-stopped
+
+  trainer:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    command: ["python", "-m", "src.training.train"]
+    environment:
+      DATA_DIR: /app/data/raw
+      MODEL_DIR: /app/models/production
+      RUNS_DIR: /app/runs
+      APP_DATABASE_URL: postgresql://admin:${POSTGRES_PASSWORD:-admin}@postgres:5432/endpointsecurity
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+    volumes:
+      - ./data:/app/data:ro
+      - ./models:/app/models
+      - ./data/runs:/app/runs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mlflow:
+        condition: service_healthy
+    profiles: ["training"]
+
+  airflow-init:
+    user: "10001:0"
+    build:
+      context: .
+      dockerfile: Dockerfile.airflow
+    command: ["bash", "-c", "airflow db migrate && (airflow users create --username admin --password admin --firstname Local --lastname Admin --role Admin --email admin@example.local || true)"]
+    environment: &airflow_environment
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://admin:${POSTGRES_PASSWORD:-admin}@postgres:5432/airflow
+      AIRFLOW__CORE__FERNET_KEY: "${AIRFLOW_FERNET_KEY:-}"
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "false"
+      AIRFLOW__WEBSERVER__SECRET_KEY: local-only-secret-key
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+      MODEL_DIR: /opt/airflow/models/production
+      DATA_DIR: /opt/airflow/data/raw
+      RUNS_DIR: /opt/airflow/runs
+      APP_DATABASE_URL: postgresql://admin:${POSTGRES_PASSWORD:-admin}@postgres:5432/endpointsecurity
+    volumes: &airflow_volumes
+      - ./airflow/dags:/opt/airflow/dags:ro
+      - ./data:/opt/airflow/data:ro
+      - ./models:/opt/airflow/models
+      - ./data/runs:/opt/airflow/runs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mlflow:
+        condition: service_healthy
+    profiles: ["airflow"]
+
+  airflow-webserver:
+    user: "10001:0"
+    build:
+      context: .
+      dockerfile: Dockerfile.airflow
+    command: ["webserver"]
+    environment: *airflow_environment
+    ports:
+      - "${AIRFLOW_PORT:-8080}:8080"
+    volumes: *airflow_volumes
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+    profiles: ["airflow"]
+
+  airflow-scheduler:
+    user: "10001:0"
+    build:
+      context: .
+      dockerfile: Dockerfile.airflow
+    command: ["scheduler"]
+    environment: *airflow_environment
+    volumes: *airflow_volumes
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+    profiles: ["airflow"]
+
+  prometheus:
+    image: prom/prometheus:v2.53.3
+    command: ["--config.file=/etc/prometheus/prometheus.yml", "--storage.tsdb.path=/prometheus"]
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    depends_on:
+      api:
+        condition: service_healthy
+    profiles: ["monitoring"]
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:11.2.2
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+    ports:
+      - "${GRAFANA_PORT:-3000}:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      - prometheus
+    profiles: ["monitoring"]
+    restart: unless-stopped
+
+  dvc:
+    build:
+      context: .
+      dockerfile: Dockerfile.versioning
+      args:
+        DVC_UID: ${DVC_UID:-0}
+    user: "${DVC_UID:-0}:0"
+    working_dir: /workspace
+    environment:
+      DVC_NO_ANALYTICS: "true"
+    volumes:
+      - .:/workspace
+    profiles: ["dvc"]
+
+volumes:
+  postgres_data:
+  mlflow_data:
+  prometheus_data:
+  grafana_data:

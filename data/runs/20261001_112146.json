@@ -1,0 +1,11 @@
+{
+  "accuracy": 1.0,
+  "precision": 1.0,
+  "recall": 1.0,
+  "f1_score": 1.0,
+  "data_source": "postgres:endpoint_activities",
+  "model_version": "20261001_112146",
+  "model_path": "/app/models/production/endpoint_model_20261001_112146.pkl",
+  "mlflow_run_id": "77e1b3acbce14e528a7748934d3a4111",
+  "created_at": "2026-10-01T11:21:49.363253+00:00"
+}

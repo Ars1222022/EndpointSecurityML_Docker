@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>EndpointSecurityML | Local Lab</title>
+  <style>
+    :root{font-family:"Bahnschrift","Segoe UI Variable","Segoe UI",sans-serif;color:#202823;background:#f1f2ed;--ink:#202823;--muted:#647068;--line:#d8ddd4;--paper:#fbfcf8;--green:#1b7653;--lime:#d3f36b;--orange:#ca542e;--blue:#28758a}
+    *{box-sizing:border-box}body{margin:0;min-width:320px}button,input{font:inherit}button{cursor:pointer}
+    .topbar{min-height:62px;background:var(--ink);color:#f5f6ef;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:0 5vw}.brand{display:flex;align-items:center;gap:12px;font-size:13px;font-weight:700;letter-spacing:0;text-transform:uppercase}.brand-mark{width:24px;height:24px;display:grid;place-items:center;background:var(--lime);color:var(--ink);font-size:15px;border-radius:5px}.top-status{color:#c6d2ca;font-size:12px}
+    .wrap{width:min(1180px,92vw);margin:32px auto 72px}.intro{display:flex;justify-content:space-between;align-items:end;gap:28px;padding-bottom:25px;border-bottom:1px solid var(--line)}.eyebrow{margin:0 0 8px;color:var(--green);font:700 11px/1.4 Consolas,monospace;letter-spacing:0;text-transform:uppercase}h1{margin:0;font-size:38px;line-height:1.05;font-weight:730}.intro p:last-child{max-width:490px;margin:10px 0 0;color:var(--muted);line-height:1.55}.right-note{flex:0 0 auto;border-left:3px solid var(--lime);padding:5px 0 5px 13px;color:var(--muted);font-size:12px;line-height:1.6}
+    .section-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:30px 0 14px}h2{margin:0;font-size:19px}.subtle{color:var(--muted);font-size:12px}.toolbar{display:flex;gap:8px;flex-wrap:wrap}.button{border:1px solid var(--ink);border-radius:4px;min-height:38px;padding:0 14px;background:var(--ink);color:white;font-size:12px;font-weight:650}.button:hover{background:var(--green);border-color:var(--green)}.button.secondary{background:var(--paper);color:var(--ink);border-color:var(--line)}.button.secondary:hover{border-color:var(--green);color:var(--green)}.button.danger{color:var(--orange);background:transparent;border-color:#e8b7a9}.button.danger:hover{color:white;background:var(--orange)}.button:disabled{cursor:wait;opacity:.6}
+    .services{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--line);border-left:1px solid var(--line)}.service{min-height:142px;padding:18px;background:var(--paper);border-right:1px solid var(--line);border-bottom:1px solid var(--line);display:flex;flex-direction:column;justify-content:space-between}.service-top{display:flex;justify-content:space-between;gap:8px;align-items:start}.service h3{margin:0;font-size:15px}.service p{margin:5px 0 0;color:var(--muted);font-size:12px}.badge{border-radius:99px;padding:4px 8px;white-space:nowrap;background:#e7eae4;color:#576158;font:700 10px Consolas,monospace;text-transform:uppercase}.badge.up{background:#d9f0e4;color:#176947}.badge.down{background:#f5e0d9;color:#a3462d}.service a{color:var(--blue);text-decoration:none;font-size:12px;font-weight:650}.service a:hover{text-decoration:underline}
+    .columns{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(310px,.8fr);gap:28px;margin-top:36px}.steps{border-top:1px solid var(--line)}.step{display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:13px;align-items:start;padding:16px 0;border-bottom:1px solid var(--line)}.step-number{width:29px;height:29px;display:grid;place-items:center;border:1px solid #b9c2b8;border-radius:50%;color:var(--green);font:700 12px Consolas,monospace}.step h3{margin:1px 0 4px;font-size:14px}.step p{margin:0;color:var(--muted);font-size:12px;line-height:1.5}.step .button{min-width:108px}
+    .panel{padding:19px;background:var(--paper);border:1px solid var(--line);border-top:3px solid var(--blue)}.panel h2{margin-bottom:8px}.panel>p{color:var(--muted);font-size:12px;line-height:1.55}label{display:block;margin:13px 0 5px;font-size:11px;font-weight:700}input{width:100%;height:38px;border:1px solid #c8d0c7;border-radius:3px;padding:0 10px;background:white;color:var(--ink)}input:focus{outline:2px solid #b8de72;border-color:var(--green)}.form-submit{margin-top:15px;width:100%}.help-links{display:flex;gap:13px;flex-wrap:wrap;margin-top:13px}.help-links a{color:var(--blue);font-size:11px}.safe-note{padding:10px 11px;margin-top:14px;background:#edf3e4;color:#485b41;font-size:11px;line-height:1.5}.feedback{min-height:18px;margin-top:10px;font-size:12px}.feedback.error{color:#a3462d}.feedback.success{color:var(--green)}
+    .taskbox{display:none;margin-top:18px;background:#202823;color:#edf3e9;border-radius:4px;padding:12px}.taskbox.visible{display:block}.task-title{display:flex;justify-content:space-between;font-size:11px;font-weight:700}pre{max-height:170px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;color:#d2e0d5;font:11px/1.55 Consolas,monospace}.footer{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:20px;color:var(--muted);font-size:11px}.footer a{color:var(--blue);text-decoration:none}
+    .artifacts{margin-top:32px;padding-top:22px;border-top:1px solid var(--line)}.artifact-note{margin:7px 0 16px;max-width:850px;color:var(--muted);font-size:12px;line-height:1.55}.dvc-state{display:inline-block;margin:0 0 13px;padding:6px 9px;border:1px solid var(--line);border-radius:3px;background:var(--paper);font-size:11px}.artifact-columns{display:grid;grid-template-columns:1fr 1fr;gap:22px}.artifact-list{min-width:0;border-top:1px solid var(--line)}.artifact-list h3{font-size:14px;margin:13px 0 8px}.artifact-list ul{list-style:none;margin:0;padding:0}.artifact-list li{display:flex;justify-content:space-between;align-items:start;gap:12px;padding:9px 0;border-bottom:1px solid var(--line);font-size:11px}.artifact-list a{max-width:70%;overflow-wrap:anywhere;color:var(--blue);text-decoration:none}.artifact-list a:hover{text-decoration:underline}.artifact-meta{white-space:nowrap;color:var(--muted)}.runs-wrap{margin-top:22px;overflow-x:auto;border-top:1px solid var(--line)}.runs-table{width:100%;border-collapse:collapse;text-align:left;font-size:11px}.runs-table th,.runs-table td{padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap}.runs-table th{color:var(--muted);font-weight:650}.runs-table td:first-child{font-family:Consolas,monospace}.empty-state{padding:14px 0;color:var(--muted);font-size:12px}
+    @media(max-width:760px){.topbar{padding:0 4vw}.top-status{max-width:140px;text-align:right}.wrap{width:92vw;margin-top:24px}.intro{display:block}h1{font-size:29px}.right-note{display:inline-block;margin-top:16px}.services{grid-template-columns:repeat(2,minmax(0,1fr))}.columns{grid-template-columns:1fr}.section-head{align-items:start;flex-direction:column}}
+    @media(max-width:460px){.services{grid-template-columns:1fr}.step{grid-template-columns:32px minmax(0,1fr)}.step .button{grid-column:2;justify-self:start}.footer{flex-direction:column}}
+  </style>
+</head>
+<body>
+  <header class="topbar"><div class="brand"><span class="brand-mark">E</span><span>EndpointSecurityML <span style="color:#d3f36b">/</span> Local Lab</span></div><div class="top-status" id="connection-status">Kontrollerar Docker...</div></header>
+  <main class="wrap">
+    <section class="intro"><div><p class="eyebrow">MLOps kontrollpanel · lokal miljö</p><h1>Din lokala labbmiljö</h1><p>Starta varje del när du behöver den. Börja med API och databas, träna modellen och lägg till orkestrering eller övervakning senare.</p></div><div class="right-note">Körs på den här datorn<br>Windows · macOS · Linux</div></section>
+    <section aria-labelledby="services-heading">
+      <div class="section-head"><div><h2 id="services-heading">Tjänster</h2><span class="subtle">Status uppdateras automatiskt</span></div><div class="toolbar"><button class="button secondary" data-start="all">Starta hela miljön</button><button class="button danger" id="stop-button">Stoppa tjänster</button></div></div>
+      <div class="services" id="services">
+        <article class="service" data-service="api"><div class="service-top"><div><h3>Prediction API</h3><p>FastAPI · 8000</p></div><span class="badge">Av</span></div><a href="http://localhost:8000/docs" target="_blank" rel="noreferrer">Öppna API-dokumentation ↗</a></article>
+        <article class="service" data-service="mlflow"><div class="service-top"><div><h3>MLflow</h3><p>Experiment och modeller · 5000</p></div><span class="badge">Av</span></div><a href="http://localhost:5000" target="_blank" rel="noreferrer">Öppna MLflow ↗</a></article>
+        <article class="service" data-service="airflow-webserver"><div class="service-top"><div><h3>Airflow</h3><p>Arbetsflöden · 8080</p></div><span class="badge">Av</span></div><a href="http://localhost:8080" target="_blank" rel="noreferrer">Öppna Airflow · admin / admin ↗</a></article>
+        <article class="service" data-service="postgres"><div class="service-top"><div><h3>PostgreSQL</h3><p>Aktiviteter och prediktioner · 5432</p></div><span class="badge">Av</span></div><span class="subtle" id="database-detail">Databas endpointsecurity · admin / admin</span></article>
+        <article class="service" data-service="prometheus"><div class="service-top"><div><h3>Prometheus</h3><p>Mätvärden · 9090</p></div><span class="badge">Av</span></div><a href="http://localhost:9090" target="_blank" rel="noreferrer">Öppna Prometheus ↗</a></article>
+        <article class="service" data-service="grafana"><div class="service-top"><div><h3>Grafana</h3><p>Dashboard · 3000</p></div><span class="badge">Av</span></div><a href="http://localhost:3000" target="_blank" rel="noreferrer">Öppna Grafana · admin / admin ↗</a></article>
+      </div>
+      <div class="taskbox" id="taskbox"><div class="task-title"><span id="task-label">Kör kommando</span><span id="task-state">startar</span></div><pre id="task-output"></pre></div>
+    </section>
+    <section class="artifacts" aria-labelledby="artifacts-heading">
+      <div class="section-head"><div><h2 id="artifacts-heading">Databas, DVC och träningsresultat</h2><span class="subtle">Filer och mätvärden från dina lokala körningar</span></div><div class="toolbar"><button class="button secondary" id="snapshot-button">Exportera DB-snapshot</button><button class="button secondary" id="version-button">Versionera med DVC</button></div></div>
+      <p class="artifact-note">Live-databasen bor i Docker-volymen <code>endpointsecurityml_postgres_data</code>. CSV-exemplet importeras till <code>endpoint_activities</code>; träningen läser därifrån och gör enkel validering/featureberedning. Export skapar en återläsningsbar fil under <code>data/snapshots/</code>. DVC sparar lokala innehållsversioner och pekfiler; MLflow visar mätvärden per träning.</p>
+      <div class="toolbar" style="margin-bottom:14px"><button class="button secondary" id="seed-button">Ladda exempeldata till PostgreSQL</button></div>
+      <div class="dvc-state" id="dvc-state">Kontrollerar DVC...</div>
+      <div class="artifact-columns">
+        <div class="artifact-list"><h3>Databassnapshots</h3><ul id="snapshots-list"><li class="empty-state">Inga exporterade snapshots ännu.</li></ul></div>
+        <div class="artifact-list"><h3>Modellfiler</h3><ul id="models-list"><li class="empty-state">Inga lokala modellfiler ännu.</li></ul></div>
+      </div>
+      <h3 style="margin:22px 0 0;font-size:14px">Träningskörningar · MLflow</h3>
+      <div class="runs-wrap"><table class="runs-table"><thead><tr><th>Startad</th><th>Version</th><th>Accuracy</th><th>Precision</th><th>Recall</th><th>F1</th><th>Status</th></tr></thead><tbody id="runs-list"><tr><td class="empty-state" colspan="7">Inga MLflow-körningar ännu. Träna modellen i steg 02.</td></tr></tbody></table></div>
+    </section>
+    <div class="columns">
+      <section aria-labelledby="steps-heading"><div class="section-head"><div><h2 id="steps-heading">Kom igång stegvis</h2><span class="subtle">Varje steg kan köras separat</span></div></div><div class="steps">
+        <article class="step"><span class="step-number">01</span><div><h3>Starta API och databas</h3><p>Grundsteget startar prediktions-API och PostgreSQL. API-dokumentationen visar tillgängliga anrop.</p></div><button class="button secondary" data-start="core">Starta grund</button></article>
+        <article class="step"><span class="step-number">02</span><div><h3>Ladda exempeldata i PostgreSQL</h3><p>Importerar CSV:n till tabellen endpoint_activities. Importen gör inget om tabellen redan innehåller data.</p></div><button class="button secondary" id="seed-step-button">Ladda data</button></article>
+        <article class="step"><span class="step-number">03</span><div><h3>Träna och jämför modeller</h3><p>Random Forest tränas från PostgreSQL. DVC versionerar data/modellfiler och MLflow sparar Accuracy, Precision, Recall och F1.</p></div><button class="button secondary" data-start="training">Kör träning</button></article>
+        <article class="step"><span class="step-number">04</span><div><h3>Gör en prediktion</h3><p>Öppna API-dokumentationen, välj POST /predict och skicka ProcessName och NetworkConnections.</p></div><a class="button secondary" href="http://localhost:8000/docs" target="_blank" rel="noreferrer">Öppna Swagger</a></article>
+        <article class="step"><span class="step-number">05</span><div><h3>Automatisera med Airflow</h3><p>Starta Airflow och kör DAG:en endpointsecurity_train_model. Airflow-resultaten syns också i MLflow.</p></div><button class="button secondary" data-start="airflow">Starta Airflow</button></article>
+        <article class="step"><span class="step-number">06</span><div><h3>Övervaka tjänsterna</h3><p>Prometheus samlar API-mätvärden. Grafana öppnar den provisionerade API-dashboarden.</p></div><button class="button secondary" data-start="monitoring">Starta monitoring</button></article>
+      </div></section>
+      <aside class="panel" aria-labelledby="secrets-heading"><h2 id="secrets-heading">GitHub Actions · Docker Hub</h2><p>Skapa först ett tomt GitHub-repository. Lägg innehållet i mappen <code>EndpointSecurityML_Docker</code> direkt i repositoryts rot; där ska du se <code>compose.yaml</code> och <code>.github/workflows</code>. Skriv sedan repository som ägare/repo här.</p><p>Publiceringsflödet behöver secrets med namnen <code>DOCKER_USERNAME</code> och <code>DOCKER_PASSWORD</code>. Spara dem manuellt via GitHub Settings om du inte vill använda formuläret.</p>
+        <form id="secret-form" autocomplete="off"><label for="repository">GitHub-repository · ägare/repo</label><input id="repository" name="repository" placeholder="exempelvis namn/EndpointSecurityML" required pattern="[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+"><label for="docker-username">Docker Hub-användarnamn</label><input id="docker-username" name="docker_username" autocomplete="off" required><label for="docker-token">Docker Hub access token</label><input id="docker-token" name="docker_token" type="password" autocomplete="new-password" required><button class="button form-submit" type="submit">Spara DOCKER-secrets i GitHub</button></form>
+        <div class="feedback" id="secret-feedback" role="status"></div><div class="safe-note">För formuläret: installera GitHub CLI och kör <code>gh auth login</code> i terminalen först. Docker Hub-token skickas till <code>gh</code>, visas inte igen och sparas inte i webbläsaren. Klistra aldrig in en GitHub PAT här. GitHub skapar sin egen <code>GITHUB_TOKEN</code> automatiskt.</div><div class="help-links"><a href="https://hub.docker.com/settings/security" target="_blank" rel="noreferrer">Skapa Docker Hub-token ↗</a><a href="https://cli.github.com/" target="_blank" rel="noreferrer">Installera GitHub CLI ↗</a><a href="https://github.com/OWNER/REPO/settings/secrets/actions" target="_blank" rel="noreferrer">GitHub repository-secrets ↗</a></div>
+      </aside>
+    </div>
+    <footer class="footer"><span>Lokala standarduppgifter: admin / admin · endast för utveckling</span><a href="../README.md">Läs projektets README</a></footer>
+  </main>
+  <script>
+    const taskBox = document.querySelector('#taskbox');
+    let activeTask = null;
+    async function refreshStatus() {
+      const status = document.querySelector('#connection-status');
+      try {
+        const response = await fetch('/api/status', { cache: 'no-store' });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Docker kunde inte nås');
+        status.textContent = 'Docker ansluten · ' + data.containers.length + ' containers';
+        for (const card of document.querySelectorAll('[data-service]')) {
+          const container = data.containers.find(item => item.Service === card.dataset.service);
+          const badge = card.querySelector('.badge');
+          const state = container?.State || container?.Status || 'Av';
+          badge.textContent = state;
+          badge.className = 'badge ' + (/running|up/i.test(state) ? 'up' : (/exited|dead/i.test(state) ? 'down' : ''));
+        }
+      } catch (error) { status.textContent = error.message; }
+    }
+    function renderArtifacts(selector, items, kind, emptyText) {
+      const list = document.querySelector(selector);
+      list.replaceChildren();
+      if (!items.length) { const empty = document.createElement('li'); empty.className = 'empty-state'; empty.textContent = emptyText; list.append(empty); return; }
+      for (const item of items) {
+        const row = document.createElement('li');
+        const link = document.createElement('a');
+        link.href = '/api/artifacts/' + kind + '/' + encodeURIComponent(item.name);
+        link.textContent = item.name;
+        const meta = document.createElement('span');
+        meta.className = 'artifact-meta';
+        meta.textContent = (item.bytes / 1024).toFixed(1) + ' KB · ' + (item.versioned ? 'DVC' : 'ej versionerad');
+        row.append(link, meta);
+        list.append(row);
+      }
+    }
+    async function refreshWorkshop() {
+      try {
+        const [artifactResponse, runResponse] = await Promise.all([fetch('/api/workshop'), fetch('/api/runs')]);
+        const artifacts = await artifactResponse.json();
+        const runData = await runResponse.json();
+        const state = document.querySelector('#dvc-state');
+        if (artifacts.database) document.querySelector('#database-detail').textContent = 'endpointsecurity · admin / admin · ' + artifacts.database.activity_rows + ' aktiviteter · ' + artifacts.database.prediction_rows + ' prediktioner';
+        state.textContent = artifacts.dvc_initialized ? 'DVC initierat · ' + artifacts.dvc_pointer_count + ' versionspekfiler' : 'DVC har inte initierats ännu · starta med knappen Versionera med DVC';
+        renderArtifacts('#snapshots-list', artifacts.snapshots || [], 'snapshots', 'Inga exporterade snapshots ännu.');
+        renderArtifacts('#models-list', artifacts.models || [], 'models', 'Inga lokala modellfiler ännu.');
+        const runList = document.querySelector('#runs-list');
+        runList.replaceChildren();
+        if (!runResponse.ok || !runData.runs?.length) {
+          const row = document.createElement('tr'); const cell = document.createElement('td');
+          cell.className = 'empty-state'; cell.colSpan = 7;
+          cell.textContent = runData.error || 'Inga MLflow-körningar ännu. Träna modellen i steg 02.';
+          row.append(cell); runList.append(row); return;
+        }
+        for (const run of runData.runs) {
+          const row = document.createElement('tr');
+          const started = run.start_time ? new Date(Number(run.start_time)).toLocaleString('sv-SE') : 'Okänt';
+          const values = [started, run.model_version, ...['accuracy','precision','recall','f1_score'].map(key => Number(run.metrics?.[key] ?? 0).toFixed(3)), run.status];
+          for (const value of values) { const cell = document.createElement('td'); cell.textContent = String(value); row.append(cell); }
+          runList.append(row);
+        }
+      } catch (error) { document.querySelector('#dvc-state').textContent = 'Kunde inte läsa DVC- och träningsresultat: ' + error.message; }
+    }
+    async function showTask(taskId) {
+      const response = await fetch('/api/tasks/' + encodeURIComponent(taskId), { cache: 'no-store' });
+      const task = await response.json();
+      document.querySelector('#task-label').textContent = task.label;
+      document.querySelector('#task-state').textContent = task.state;
+      document.querySelector('#task-output').textContent = (task.output || []).join('\n');
+      if (['success', 'failed'].includes(task.state)) { activeTask = null; refreshStatus(); refreshWorkshop(); }
+      else window.setTimeout(() => showTask(taskId), 1200);
+    }
+    async function startAction(action) {
+      if (activeTask) return;
+      taskBox.classList.add('visible');
+      document.querySelector('#task-label').textContent = 'Startar ' + action;
+      document.querySelector('#task-state').textContent = 'startar';
+      document.querySelector('#task-output').textContent = '';
+      const response = await fetch('/api/start', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action }) });
+      const data = await response.json();
+      if (!response.ok) { document.querySelector('#task-state').textContent = 'fel'; document.querySelector('#task-output').textContent = data.error || 'Kunde inte starta tjänsten.'; return; }
+      activeTask = data.task_id;
+      showTask(activeTask);
+    }
+    document.querySelectorAll('[data-start]').forEach(button => button.addEventListener('click', () => startAction(button.dataset.start)));
+    document.querySelector('#stop-button').addEventListener('click', async () => {
+      if (activeTask) return;
+      const response = await fetch('/api/stop', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+      const data = await response.json();
+      if (response.ok) { taskBox.classList.add('visible'); activeTask = data.task_id; showTask(activeTask); }
+    });
+    async function launchMaintenance(path, label) {
+      if (activeTask) return;
+      const response = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+      const data = await response.json();
+      if (!response.ok) { taskBox.classList.add('visible'); document.querySelector('#task-label').textContent = label; document.querySelector('#task-state').textContent = 'fel'; document.querySelector('#task-output').textContent = data.error || 'Åtgärden misslyckades.'; return; }
+      taskBox.classList.add('visible'); activeTask = data.task_id; showTask(activeTask);
+    }
+    document.querySelector('#snapshot-button').addEventListener('click', () => launchMaintenance('/api/snapshot', 'Exportera PostgreSQL'));
+    document.querySelector('#seed-button').addEventListener('click', () => launchMaintenance('/api/seed-data', 'Ladda PostgreSQL-exempeldata'));
+    document.querySelector('#seed-step-button').addEventListener('click', () => launchMaintenance('/api/seed-data', 'Ladda PostgreSQL-exempeldata'));
+    document.querySelector('#version-button').addEventListener('click', () => launchMaintenance('/api/version-artifacts', 'Versionera data och modeller med DVC'));
+    document.querySelector('#secret-form').addEventListener('submit', async event => {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const feedback = document.querySelector('#secret-feedback');
+      const values = Object.fromEntries(new FormData(form).entries());
+      feedback.className = 'feedback';
+      feedback.textContent = 'Sparar secrets...';
+      try {
+        const response = await fetch('/api/github-secrets', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(values) });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || 'Kunde inte spara secrets.');
+        feedback.className = 'feedback success';
+        feedback.textContent = 'Sparat: ' + result.secrets.join(', ') + '. Värdena visas inte igen.';
+        form.reset();
+      } catch (error) { feedback.className = 'feedback error'; feedback.textContent = error.message; document.querySelector('#docker-token').value = ''; }
+    });
+    refreshStatus();
+    refreshWorkshop();
+    window.setInterval(refreshStatus, 5000);
+    window.setInterval(refreshWorkshop, 10000);
+  </script>
+</body>
+</html>

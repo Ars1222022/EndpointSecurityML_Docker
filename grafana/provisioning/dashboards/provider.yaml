@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: Endpoint Security
+    orgId: 1
+    folder: Endpoint Security
+    type: file
+    disableDeletion: true
+    editable: true
+    options:
+      path: /var/lib/grafana/dashboards

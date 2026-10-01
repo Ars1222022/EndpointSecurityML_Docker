@@ -1,0 +1,6 @@
+outs:
+- md5: 28730e0e087af899d5abe4d92bbaae95
+  size: 628
+  isexec: true
+  hash: md5
+  path: endpoint_activities.csv
